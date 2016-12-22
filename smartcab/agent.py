@@ -87,8 +87,8 @@ class LearningAgent(Agent):
         str_state = str(state)
         current_state_dict = self.Q[str_state]
         maxQ = max(current_state_dict, key=current_state_dict.get)
-
-        return maxQ 
+        maxQ_value = current_state_dict[maxQ]
+        return maxQ_value
 
 
     def createQ(self, state):
@@ -133,8 +133,12 @@ class LearningAgent(Agent):
         elif random.random() <= self.epsilon:
             action = random.choice(self.valid_actions)
         else:
-            action = self.get_maxQ(state)
-
+            maxQ_value = self.get_maxQ(state)
+            str_state = str(state)
+            current_q_table = self.Q[str_state]
+            possible_actions = [action for action, value in current_q_table.items() if value == maxQ_value]
+            #action = self.get_maxQ(state)
+            action = random.choice(possible_actions)
         return action
 
 
@@ -150,7 +154,8 @@ class LearningAgent(Agent):
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         if self.learning == True:
             str_state = str(state)
-            self.Q[str_state][action] += self.alpha * reward
+            old_value = self.Q[str_state][action]
+            self.Q[str_state][action] += self.alpha * reward - old_value
         return
 
 
